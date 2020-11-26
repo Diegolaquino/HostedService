@@ -22,7 +22,7 @@ namespace HostedService
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).ConfigureServices(services =>
+                }).ConfigureServices(services =>  // iniciando o hosted service
                     services.AddHostedService<BackgroundPrinter>());
     }
 }
