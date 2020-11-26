@@ -8,31 +8,22 @@ using System.Threading.Tasks;
 
 namespace HostedService
 {
-    public class BackgroundPrinter : IHostedService, IDisposable
+    public class BackgroundPrinter : IHostedService
     {
         private readonly ILogger<BackgroundPrinter> logger;
         private int _number = 0;
         private Timer _timer;
+        private IWorker _worker;
 
-        public BackgroundPrinter(ILogger<BackgroundPrinter> logger)
+        public BackgroundPrinter(ILogger<BackgroundPrinter> logger, IWorker worker)
         {
             this.logger = logger;
+            this._worker = worker;
         }
 
-        public void Dispose()
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer?.Dispose();
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _timer = new Timer(o =>
-            {
-                Interlocked.Increment(ref _number);
-                logger.LogInformation($"Eu aqui de novo seus putos -> {_number}");
-            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
-
-            return Task.CompletedTask;
+            await _worker.DoWork(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
